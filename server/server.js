@@ -6,7 +6,6 @@ const app = express();
 
 app.use(express.json());
 
-// Routes (we'll add later)
 app.use("/api/auth", require("./routes/authRoutes"));
 
 mongoose.connect(process.env.MONGO_URI)
