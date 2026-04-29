@@ -1,24 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/register";
 import Login from "./pages/login";
-import Home from "./pages/home";
-import ProtectedRoute from "./components/ProtectedRoute";
+import Browse from "./pages/browse";
+import ListingDetail from "./pages/listingDetail";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* PUBLIC */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+        {/* PROTECTED (manual check happens inside pages) */}
+        <Route path="/" element={<Browse />} />
+        <Route path="/listing/:id" element={<ListingDetail />} />
       </Routes>
     </Router>
   );
