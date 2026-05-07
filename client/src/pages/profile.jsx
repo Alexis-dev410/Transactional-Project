@@ -111,9 +111,15 @@ function Profile() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>My Profile</h2>
-        <button onClick={handleLogout}>Logout</button>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h2>My Profile</h2>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={() => navigate("/")}>Back to Listings</button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
 
       {message && <p>{message}</p>}

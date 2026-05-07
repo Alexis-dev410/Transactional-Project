@@ -33,6 +33,7 @@ function Browse() {
   // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     navigate("/login");
   };
 
@@ -46,9 +47,15 @@ function Browse() {
   return (
     <div>
       {/* 🔹 Header */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>Listings</h2>
-        <button onClick={handleLogout}>Logout</button>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h2>Listings</h2>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Link to="/profile">Profile</Link>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
 
       {/* 🔹 Filters */}

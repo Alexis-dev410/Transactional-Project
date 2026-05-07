@@ -3,6 +3,7 @@ import Register from "./pages/register";
 import Login from "./pages/login";
 import Browse from "./pages/browse";
 import ListingDetail from "./pages/listingDetail";
+import Profile from "./pages/profile";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         {/* PROTECTED (manual check happens inside pages) */}
         <Route path="/" element={<Browse />} />
         <Route path="/listing/:id" element={<ListingDetail />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
