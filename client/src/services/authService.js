@@ -13,6 +13,11 @@ export const login = async (userData) => {
 
   if (data.token) {
     localStorage.setItem("token", data.token);
+
+    // ✅ SAVE USER ID
+    if (data.user) {
+      localStorage.setItem("userId", data.user._id);
+    }
   }
 
   return data;

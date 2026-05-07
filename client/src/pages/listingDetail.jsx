@@ -10,29 +10,24 @@ function ListingDetail() {
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-
-  // 🔹 Protect route
-  useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      navigate("/login");
-    }
-  }, [navigate]);
+  const [photo, setPhoto] = useState(null);
 
   // 🔹 Fetch listing
   useEffect(() => {
     fetch(`http://localhost:3000/api/listings/${id}`)
-      .then(res => res.json())
-      .then(data => setListing(data));
+      .then((res) => res.json())
+      .then((data) => setListing(data));
   }, [id]);
 
   // 🔹 Fetch reviews
   useEffect(() => {
     fetch("http://localhost:3000/api/reviews")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const filtered = data.filter(
           (r) => r.listingId?.toString() === id
         );
+
         setReviews(filtered);
       });
   }, [id]);
@@ -42,25 +37,33 @@ function ListingDetail() {
     e.preventDefault();
 
     try {
+      const formData = new FormData();
+
+      formData.append("listingId", id);
+      formData.append("rating", rating);
+      formData.append("comment", comment);
+
+      if (photo) {
+        formData.append("photo", photo);
+      }
+
       const res = await fetch("http://localhost:3000/api/reviews", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          listingId: id,
-          rating,
-          comment,
-        }),
+        body: formData,
       });
 
       const data = await res.json();
 
       if (res.ok) {
         alert("Review submitted");
+
         setReviews([...reviews, data]);
+
         setComment("");
+        setPhoto(null);
       } else {
         alert(data.message);
       }
@@ -72,28 +75,40 @@ function ListingDetail() {
 
   // 🔹 Delete review
   const handleDelete = async (reviewId) => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/reviews/${reviewId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-    const data = await res.json();
-    console.log("DELETE response:", data);
+      const data = await res.json();
 
-    if (res.ok) {
-      // ✅ Only update UI if backend succeeded
-      setReviews(reviews.filter((r) => r._id !== reviewId));
-    } else {
-      alert(data.message || "Delete failed");
+      if (res.ok) {
+        setReviews(reviews.filter((r) => r._id !== reviewId));
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
     }
+  };
 
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
-};
+  const currentUserId = localStorage.getItem("userId");
+
+  const isOwnReview = (review) => {
+    if (!currentUserId || !review?.userId) return false;
+
+    return (
+      review.userId._id?.toString() === currentUserId ||
+      review.userId.toString() === currentUserId
+    );
+  };
 
   if (!listing) return <p>Loading...</p>;
 
@@ -108,7 +123,10 @@ function ListingDetail() {
       <h2>{listing.name}</h2>
 
       {listing.images?.picture_url && (
-        <img src={listing.images.picture_url} width="300" />
+        <img
+          src={listing.images.picture_url}
+          width="300"
+        />
       )}
 
       <p>{listing.summary}</p>
@@ -124,21 +142,39 @@ function ListingDetail() {
       {reviews.length === 0 && <p>No reviews yet</p>}
 
       {reviews.map((r) => (
-        <div key={r._id} style={{ border: "1px solid white", margin: "10px" }}>
+        <div
+          key={r._id}
+          style={{
+            border: "1px solid white",
+            margin: "10px",
+            padding: "10px",
+          }}
+        >
           <p>
             {r.userId?.firstName} {r.userId?.lastName}
           </p>
+
           <p>⭐ {r.rating}</p>
+
           <p>{r.comment}</p>
 
-          {/* ✅ DELETE BUTTON */}
-          <button onClick={() => handleDelete(r._id)}>
-            Delete
-          </button>
+          {isOwnReview(r) && (
+            <button onClick={() => handleDelete(r._id)}>
+              Delete
+            </button>
+          )}
+
+          {/* 🔹 Uploaded photo */}
+          {r.photoPath && (
+            <img
+              src={`http://localhost:3000/uploads/${r.photoPath}`}
+              width="200"
+            />
+          )}
         </div>
       ))}
 
-      {/* 🔹 Add review */}
+      {/* 🔹 Review form */}
       {localStorage.getItem("token") && (
         <div>
           <h3>Add Review</h3>
@@ -159,7 +195,15 @@ function ListingDetail() {
               onChange={(e) => setComment(e.target.value)}
             />
 
-            <button type="submit">Submit Review</button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPhoto(e.target.files[0])}
+            />
+
+            <button type="submit">
+              Submit Review
+            </button>
           </form>
         </div>
       )}

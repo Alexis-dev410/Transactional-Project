@@ -48,6 +48,7 @@ exports.register = async (req, res) => {
     res.status(201).json({
       token: generateToken(user),
       user: {
+        _id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName
@@ -77,6 +78,7 @@ exports.login = async (req, res) => {
     res.json({
       token: generateToken(user),
       user: {
+        _id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName
