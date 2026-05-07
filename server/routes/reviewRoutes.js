@@ -1,10 +1,11 @@
+const upload = require("../config/multer");
 const express = require("express");
 const router = express.Router();
 const Review = require("../models/Review");
 const authMiddleware = require("../middleware/authMiddleware");
 
 
-
+F
 // GET all reviews
 router.get("/", async (req, res) => {
   try {
@@ -16,8 +17,8 @@ router.get("/", async (req, res) => {
 });
 
 // CREATE review
-router.post("/", authMiddleware, async (req, res) => {
-  try {
+router.post("/", authMiddleware, upload.single("photo"), async (req, res) => {
+    try {
     const { listingId, rating, comment } = req.body;
 
     // one review per user per listing
@@ -35,6 +36,7 @@ router.post("/", authMiddleware, async (req, res) => {
       userId: req.user.id,
       rating,
       comment,
+      photoPath: req.file ? req.file.filename : null,
     });
 
     await review.save();

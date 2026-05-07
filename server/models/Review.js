@@ -9,6 +9,9 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   },
+  photoPath: {
+  type: String,
+  },
   rating: { type: Number, min: 1, max: 5 },
   comment: String,
   photoPath: String
